@@ -1,0 +1,17 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+  "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="tz.cn.dao.ProDao">
+	<!-- 查询省份信息 -->
+	<select id="findProvince" resultType="TbProvince">
+		select * from tb_province
+	</select>
+	<!-- 查询城市信息 -->
+	<select id="findCityByCode" resultType="TbCity">
+		select * from tb_city where provincecode=#{provincecode}
+	</select>
+	<!-- 查询区县信息 -->
+	<select id="findAreaByCode" resultType="TbArea">
+		select * from tb_area where citycode=#{citycode}
+	</select>
+</mapper>

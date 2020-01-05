@@ -1,0 +1,25 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+  "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="tz.cn.dao.SynthesizeDao">
+	<!-- 查询出年销售数据 -->
+	<select id="findYear" resultType="map">
+		select year(newDate) as years,sum(orderAmountTotal) as price from tb_order
+		WHERE orderStatus in('已发货','已签收','已付款','交易成功')
+		GROUP BY YEAR(newDate)
+	</select>
+	<!-- 查询出季度销售数据 -->
+	<select id="findQuarter" resultType="map">
+		select QUARTER(newDate) as quarters,sum(orderAmountTotal) as price from tb_order
+		WHERE orderStatus in('已发货','已签收','已付款','交易成功')
+		and DATE_FORMAT(newDate,'%y')=DATE_FORMAT(CURDATE(),'%y')
+		GROUP BY QUARTER(newDate)
+	</select>
+	<!-- 查询月销售数据 -->
+	<select id="findMonth" resultType="map">
+		select MONTH(newDate) as months,sum(orderAmountTotal) as price from tb_order
+		WHERE orderStatus in('已发货','已签收','已付款','交易成功')
+		and DATE_FORMAT(newDate,'%y')=DATE_FORMAT(CURDATE(),'%y')
+		GROUP BY MONTH(newDate)
+	</select>
+</mapper>

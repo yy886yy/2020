@@ -1,0 +1,48 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<beans default-lazy-init="true"
+    xmlns="http://www.springframework.org/schema/beans" 
+    xmlns:p="http://www.springframework.org/schema/p"
+    xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" 
+    xmlns:context="http://www.springframework.org/schema/context"
+    xmlns:tx="http://www.springframework.org/schema/tx"
+    xmlns:aop="http://www.springframework.org/schema/aop" 
+    xmlns:mvc="http://www.springframework.org/schema/mvc"
+    xmlns:util="http://www.springframework.org/schema/util"
+    xmlns:jpa="http://www.springframework.org/schema/data/jpa"
+    xsi:schemaLocation="  
+       http://www.springframework.org/schema/beans   
+       http://www.springframework.org/schema/beans/spring-beans-4.3.xsd  
+       http://www.springframework.org/schema/mvc   
+       http://www.springframework.org/schema/mvc/spring-mvc-4.3.xsd   
+       http://www.springframework.org/schema/tx   
+       http://www.springframework.org/schema/tx/spring-tx-4.3.xsd   
+       http://www.springframework.org/schema/aop 
+       http://www.springframework.org/schema/aop/spring-aop-4.3.xsd
+       http://www.springframework.org/schema/util 
+       http://www.springframework.org/schema/util/spring-util-4.3.xsd
+       http://www.springframework.org/schema/data/jpa 
+       http://www.springframework.org/schema/data/jpa/spring-jpa-1.3.xsd
+       http://www.springframework.org/schema/context
+       http://www.springframework.org/schema/context/spring-context-4.3.xsd">
+       <!-- 引入数据源属性配置文件 -->
+       <util:properties id="cfg" location="classpath:configs/configs.properties"/>
+       <!-- 配置数据 -->
+       <bean id="druid" class="com.alibaba.druid.pool.DruidDataSource">
+       		<property name="DriverClassName" value="#{cfg.jdbcDriver}"/>
+ 			<property name="Url" value="#{cfg.jdbcUrl}"/>
+ 			<property name="Username" value="#{cfg.jdbcUser}"/>
+ 			<property name="Password" value="#{cfg.jdbcPassword}"/>
+       </bean>
+       <!-- 配置mybatis会话工厂 -->
+       <bean id="sqlSessionFactory" class="org.mybatis.spring.SqlSessionFactoryBean">
+       		<property name="DataSource" ref="druid"/>
+       		<property name="typeAliasesPackage" value="tz.cn.pojo"/>
+       		<property name="MapperLocations" value="classpath:configs/mapper/*Mapper.xml"/>
+       		<property name="configLocation" value="classpath:configs/mybatis-config.xml"/>
+       </bean>
+       <!-- 为DAO层创建代理对象 -->
+       <bean class="org.mybatis.spring.mapper.MapperScannerConfigurer">
+       		<property name="basePackage" value="tz.cn.dao"/>
+       		<property name="sqlSessionFactoryBeanName" value="sqlSessionFactory"/>
+       </bean>
+</beans>

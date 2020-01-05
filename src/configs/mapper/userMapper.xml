@@ -1,0 +1,73 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+  "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="tz.cn.dao.UserDao">
+	<sql id="whereUserName">
+		<where>
+			<if test="userName!=null and userName!=''">
+				userName=#{userName}
+			</if>
+		</where>
+	</sql>
+	<!-- 获取总记录数 -->
+	<select id="getRowCount" resultType="int">
+		select count(*) from tb_userinfo 
+		<include refid="whereUserName"/>
+	</select>
+	<!-- 获取分页信息的数据 -->
+	<select id="findObjects" resultType="TbUserinfo">
+		select * from tb_userinfo 
+		<include refid="whereUserName"/>
+		limit #{startIndex},#{pageSize}
+	</select>
+	<!-- 修改状态信息 -->
+	<update id="updateStateById">
+		update tb_userinfo set state=#{state} where id=#{id}
+	</update>
+	<!-- 根据ID删除用户 -->
+	<delete id="delUserInfoById">
+		delete from tb_userinfo where id=#{id}
+	</delete>
+	<!-- 批量删除用户 -->
+	<delete id="delUserInfoByIds">
+		delete from tb_userinfo
+		<where>
+			<if test="ids==null and ids==''">
+			id is null
+			</if>
+			<if test="ids!=null and ids!=''">
+			id in
+			<foreach collection="ids"
+					 open="("
+					 close=")"
+					 separator=","
+					 item="id">
+					#{id}
+			</foreach>
+			</if>
+		</where>
+	</delete>
+	<!-- 添加管理员信息 -->
+	<insert id="saveUserInfo">
+		insert into tb_userinfo (`userName`,`passWord`,`email`,`phone`,`address`,`pic`,`sex`,`state`,`province`,`city`,`area`)
+		values(
+		#{user.userName},#{user.passWord},#{user.email},#{user.phone},#{user.address},#{user.pic},#{user.sex},
+		#{user.state},#{user.province},#{user.city},#{user.area}
+		)
+	</insert>
+	<!-- 根据id查询对应的信息 -->
+	<select id="findUserinfoById" resultType="TbUserinfo">
+		select * from tb_userinfo where id=#{id}
+	</select>
+	<!-- 修改管理员信息 -->
+	<update id="updateUserinfo">
+		update tb_userinfo set
+			userName=#{user.userName},email=#{user.email},phone=#{user.phone},address=#{user.address},pic=#{user.pic},
+			sex=#{user.sex},state=#{user.state},province=#{user.province},city=#{user.city},area=#{user.area}
+		where id=#{user.id}
+	</update>
+	<!-- 根据用户名和密码查询用户是否存在 -->
+	<select id="findUserByNameAndPwd" resultType="TbUserinfo">
+		select * from tb_userinfo where userName=#{userName} and passWord=#{passWord}
+	</select>
+</mapper>

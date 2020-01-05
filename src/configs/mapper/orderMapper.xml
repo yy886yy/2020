@@ -1,0 +1,73 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+  "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="tz.cn.dao.OrderDao">
+	<sql id="whereName">
+		<where>
+			<if test="customerName!=null and customerName!=''">and orderConsignee=#{customerName}</if>
+			<if test="orderlogisticsId!=null and orderlogisticsId!=''">and orderlogisticsId=#{orderlogisticsId}</if>
+			<if test="orderStatus!=null and orderStatus!=''">and orderStatus=#{orderStatus}</if>
+		</where>
+	</sql>
+	<resultMap type="tz.cn.vo.OrderVO" id="orderMap">
+		<association property="customer"
+					 column="customerId"
+					 select="tz.cn.dao.CustomerDao.findCustomerById">
+		</association>
+	</resultMap>
+	<!-- 查询总条数 -->
+	<select id="getRowCount" resultType="int">
+		select count(*) from tb_order
+		<include refid="whereName"/>
+	</select>
+	<!-- 查询分页数据 -->
+	<select id="findOrderList" resultMap="orderMap">
+		select * from tb_order
+		<include refid="whereName"/>
+		limit #{startIndex},#{pageSize}
+	</select>
+	<!-- 根据id删除订单 -->
+	<delete id="delorderinfoById">
+		delete from tb_order where id=#{id}
+	</delete>
+	<!-- 根据订单编号查询订单id -->
+	<select id="findOrderIdByCode" resultType="int">
+		select id from tb_order where orderNumber=#{orderCode}
+	</select>
+	<!-- 根据订单编号查询订单信息 -->
+	<select id="findOrderIdByOrderNumber" resultType="TbOrder">
+		select * from tb_order where orderNumber=#{orderNumber}
+	</select>
+	<!-- 批量删除订单 -->
+	<delete id="delorderinfoByIds">
+		delete from tb_order 
+		<where>
+			<if test="ids==null or ids==''">
+				id is null
+			</if>
+			<if test="ids!=null and ids!=''">
+				id in
+				<foreach collection="ids"
+						 open="("
+						 close=")"
+						 separator=","
+						 item="id">
+						#{id}
+				</foreach>
+			</if>
+		</where>
+	</delete>
+	<!-- 添加订单信息 -->
+	<insert id="saveOrder"
+				useGeneratedKeys="true"
+				keyProperty="id">
+		insert into tb_order (`orderNumber`,`orderStatus`,`productCount`,`address`,`orderConsignee`,`phone`,`customerId`,`productAmountTotal`,`orderAmountTotal`)
+		values(#{orderNumber},#{orderStatus},#{productCount},#{address},#{orderConsignee},#{phone},#{customerId},#{productAmountTotal},#{orderAmountTotal})
+	</insert>
+	<!-- 根据id修改小计金额、实际金额和数量 -->
+	<update id="updateOrder">
+		update tb_order set
+		productAmountTotal=#{productAmountTotal},orderAmountTotal=#{orderAmountTotal},productCount=#{productCount}
+		where id=#{id}
+	</update>
+</mapper>

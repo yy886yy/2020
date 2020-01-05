@@ -1,0 +1,72 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+  "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="tz.cn.dao.DetailDao">
+	<sql id="whereOrderId">
+		<where>
+			<if test="orderId==null or orderId==''">
+				1=2
+			</if>
+			<if test="orderId!=null and orderId!=''">
+				orderId=#{orderId}
+			</if>
+		</where>
+	</sql>
+	<!-- 查询总条数 -->
+	<select id="getRowCount" resultType="int">
+		select count(*) from tb_order_detail
+		<include refid="whereOrderId"/>
+	</select>
+	<!-- 查询分页数据 -->
+	<select id="findDetails" resultType="TbOrderDetail">
+		select * from tb_order_detail
+		<include refid="whereOrderId"/>
+		limit #{startIndex},#{pageSize}
+	</select>
+	<!-- 添加订单的详细信息 -->
+	<insert id="saveOrderDetail">
+		insert into tb_order_detail (`productId`,`orderId`,`productName`,`productPrice`,`discountRate`,`orderDetailNumber`,`subtotal`,`productMarque`)
+		values(#{productId},#{orderId},#{productName},#{productPrice},#{discountRate},#{orderDetailNumber},#{subtotal},#{productMarque})
+	</insert>
+	<!-- 根据商品ID和订单ID查询详细订单 -->
+	<select id="findObjectByOIdandPid" resultType="TbOrderDetail">
+		select * from tb_order_detail
+		where productId=#{productId} and orderId=#{orderId}
+	</select>	
+	<!-- 修改详细订单的小计金额和数量 -->
+	<update id="updateOrderDetail">
+		update tb_order_detail set 
+		subtotal=#{subtotal},orderDetailNumber=#{orderDetailNumber}
+		where id=#{id}
+	</update>
+	<!-- 根据id获取订单id -->
+	<select id="findOrderIdbyDetailId" resultType="int">
+		select orderId from tb_order_detail where id=#{id}
+	</select>
+	<!-- 根据id删除数据 -->
+	<delete id="delOrderDetailById">
+		delete from tb_order_detail where id=#{id}
+	</delete>
+	<!-- 打到对应的订单id -->
+	<select id="findOrderIdbyDetailIds" resultType="int">
+		select orderId from tb_order_detail where id in
+		<foreach collection="ids"
+				 open="("
+				 close=")"
+				 separator=","
+				 item="id">
+				#{id}
+		</foreach>
+	</select>
+	<!-- 批量删除详细订单 -->
+	<delete id="delOrderDetails">
+		delete from tb_order_detail where id in
+		<foreach collection="ids"
+				  open="("
+				  close=")"
+				  separator=","
+				  item="id">
+				#{id}
+		</foreach>
+	</delete>
+</mapper>
